@@ -1,0 +1,14 @@
+.DS_Store
+build/
+DerivedData/
+.derivedData/
+*.xcresult
+xcuserdata/
+*.xcuserstate
+.build/
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/test_output/
+*.ipa
+*.xcarchive
+.env
