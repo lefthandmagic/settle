@@ -32,7 +32,7 @@ platform :ios do
     if app.nil?
       UI.important("Create the App Store Connect record once (API keys cannot CREATE apps):")
       UI.important("https://appstoreconnect.apple.com → My Apps → + → iOS")
-      UI.important("Name: Settle  ·  Bundle ID: #{BUNDLE_ID}  ·  SKU: settle-001")
+      UI.important("Name: Seatloose  ·  Bundle ID: #{BUNDLE_ID}  ·  SKU: seatloose-001")
     else
       UI.success("App Store Connect app already exists")
     end

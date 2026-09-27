@@ -33,7 +33,7 @@ jobs:
     runs-on: macos-15
     env:
       APP_BUNDLE_IDENTIFIER: com.praveenmurugesan.Settle
-      APP_NAME: Settle
+      APP_NAME: Seatloose
       MARKETING_VERSION_PREFIX: "1.0"
       APPSTORE_KEY_ID: ${{ secrets.APPSTORE_KEY_ID }}
       APPSTORE_ISSUER_ID: ${{ secrets.APPSTORE_ISSUER_ID }}

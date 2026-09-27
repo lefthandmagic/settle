@@ -8,7 +8,7 @@ struct HomeView: View {
         NavigationStack {
             ScrollView {
                 VStack(alignment: .leading, spacing: 22) {
-                    Text("Settle")
+                    Text("Seatloose")
                         .font(.system(size: 40, weight: .bold))
                         .foregroundStyle(ink)
                     Text("Mobility for the seat and the bed. Ease off if a hip or your low back pinches.")
