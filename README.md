@@ -1,7 +1,7 @@
 # MyFlexLife
 
-Mobility for a seat or a bed. Twenty movements, each with a short looping demo.
+Mobility for where you actually are. Each movement names the muscles it uses, and the library can filter by muscle.
 
-Flight is seat-only. Bed is lying down. The library can filter by place or body area.
+Sessions: flight, in bed, desk, hotel room, and wake up. A front and back body map opens those muscles.
 
-The loops are drawn figures so the set can be reviewed before any filming.
+Female and male are drawn avatars you can switch. A filmed or AI clip can replace each loop later.

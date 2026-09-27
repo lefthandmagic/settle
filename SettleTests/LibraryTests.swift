@@ -2,21 +2,38 @@ import XCTest
 @testable import Settle
 
 final class LibraryTests: XCTestCase {
-    func testFlightAndBedAreSeparate() {
-        XCTAssertEqual(Library.flight.count, 10)
-        XCTAssertEqual(Library.bed.count, 10)
-        XCTAssertTrue(Library.flight.allSatisfy { $0.place == .flight })
-        XCTAssertTrue(Library.bed.allSatisfy { $0.place == .bed })
+    func testModulesCoverTheLibrary() {
+        XCTAssertEqual(Library.session(.flight).count, 10)
+        XCTAssertEqual(Library.session(.bed).count, 10)
+        XCTAssertEqual(Library.session(.desk).count, 8)
+        XCTAssertEqual(Library.session(.hotel).count, 6)
+        XCTAssertEqual(Library.session(.wakeup).count, 6)
+        XCTAssertEqual(Library.all.count, 24)
     }
 
-    func testEveryMoveHasItsOwnVideo() {
-        let names = Library.all.map(\.video)
-        XCTAssertEqual(Set(names).count, names.count)
-        XCTAssertTrue(Library.all.allSatisfy { $0.video == $0.id })
+    func testEveryMoveNamesItsMusclesAndClip() {
+        XCTAssertTrue(Library.all.allSatisfy { !$0.muscles.isEmpty && $0.video == $0.id })
+        let female = Library.all.map { $0.clip(.female) }
+        let male = Library.all.map { $0.clip(.male) }
+        XCTAssertEqual(Set(female).count, female.count)
+        XCTAssertTrue(female.allSatisfy { $0.hasSuffix("-f") })
+        XCTAssertTrue(male.allSatisfy { $0.hasSuffix("-m") })
     }
 
-    func testSessionsStayInPlace() {
-        XCTAssertEqual(Library.session(.flight).map(\.id), Library.flight.map(\.id))
-        XCTAssertEqual(Library.session(.bed).map(\.id), Library.bed.map(\.id))
+    func testMuscleFilterAndBodyMapAgree() {
+        let glutes = Library.matching(.glutes)
+        XCTAssertFalse(glutes.isEmpty)
+        XCTAssertTrue(glutes.allSatisfy { $0.muscles.contains(.glutes) })
+        let mapped = Set(BodyZone.all.flatMap(\.muscles))
+        let used = Set(Library.all.flatMap(\.muscles))
+        XCTAssertEqual(mapped, used)
+    }
+
+    func testPlaylistsResolve() {
+        for module in Module.allCases {
+            let session = Library.session(module)
+            XCTAssertEqual(session.count, Library.playlists[module]?.count)
+            XCTAssertTrue(session.allSatisfy { $0.modules.contains(module) })
+        }
     }
 }

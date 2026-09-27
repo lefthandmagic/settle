@@ -47,6 +47,9 @@ def draw_scene(draw: ImageDraw.ImageDraw, kind: str) -> None:
         draw.rounded_rectangle((120, 250, 250, 700), radius=28, fill=SOFT)
         draw.rounded_rectangle((180, 620, 560, 700), radius=24, fill=SOFT)
         draw.rounded_rectangle((150, 860, 570, 900), radius=8, fill=(230, 222, 208, 255))
+    elif kind == "hotel":
+        draw.rectangle((0, 0, 180, H), fill=SOFT)
+        draw.rectangle((0, 800, W, H), fill=(230, 222, 208, 255))
     else:
         draw.rounded_rectangle((70, 520, 660, 760), radius=36, fill=SOFT)
         draw.ellipse((90, 500, 250, 640), fill=(236, 228, 214, 255))
@@ -60,7 +63,7 @@ def joint(draw, p, r, color):
     draw.ellipse((p[0] - r, p[1] - r, p[0] + r, p[1] + r), fill=color)
 
 
-def figure(draw, pts, hot):
+def figure(draw, pts, hot, avatar: str):
     pairs = [
         ("head", "neck", False),
         ("neck", "shoulder", False),
@@ -79,12 +82,17 @@ def figure(draw, pts, hot):
     for a, b, on in pairs:
         if a in pts and b in pts:
             bone(draw, pts[a], pts[b], CLAY if on else INK, 14 if on else LINE)
-    joint(draw, pts["head"], 34, (245, 240, 230, 255))
+    head = pts["head"]
+    if avatar == "f":
+        draw.arc((head[0] - 52, head[1] - 46, head[0] + 40, head[1] + 58), start=200, end=40, fill=INK, width=8)
+    joint(draw, head, 34, (245, 240, 230, 255))
     draw.ellipse(
-        (pts["head"][0] - 34, pts["head"][1] - 34, pts["head"][0] + 34, pts["head"][1] + 34),
+        (head[0] - 34, head[1] - 34, head[0] + 34, head[1] + 34),
         outline=INK,
         width=8,
     )
+    label = "Female" if avatar == "f" else "Male"
+    draw.text((40, 40), label, fill=INK)
     for name in ("shoulder", "hip", "knee", "ankle", "elbow", "knee2", "ankle2"):
         if name in pts:
             joint(draw, pts[name], 8, CLAY if name.startswith(tuple(hot)) or any(h in name for h in hot) else INK)
@@ -245,6 +253,58 @@ def bed(t, kind):
     return pts, hot
 
 
+def room(t, kind):
+    w = wave(t)
+    u = hump(t)
+    head = (430, 230)
+    neck = (440, 290)
+    shoulder = (450, 350)
+    hip = (460, 530)
+    elbow = (360, 390)
+    hand = (190, 360)
+    elbow2 = (390, 430)
+    hand2 = (200, 430)
+    knee = (470, 680)
+    ankle = (480, 820)
+    toe = (540, 830)
+    knee2 = (420, 690)
+    ankle2 = (360, 820)
+    toe2 = (300, 830)
+    pts = dict(
+        head=head, neck=neck, shoulder=shoulder, hip=hip,
+        elbow=elbow, hand=hand, elbow2=elbow2, hand2=hand2,
+        knee=knee, ankle=ankle, toe=toe, knee2=knee2, ankle2=ankle2, toe2=toe2,
+    )
+    hot = set()
+    if kind == "wall-chest":
+        shift = 50 * u
+        for name in ("head", "neck", "shoulder", "hip"):
+            pts[name] = (pts[name][0] - shift, pts[name][1])
+        hot = {"arm", "arm2"}
+    elif kind == "wall-calf":
+        pts["hip"] = (hip[0] - 30 * u, hip[1])
+        pts["knee2"] = (knee2[0] - 20 * u, knee2[1])
+        pts["ankle2"] = (ankle2[0] - 70, ankle2[1])
+        pts["toe2"] = (toe2[0] - 80, toe2[1] - 8 * u)
+        hot = {"leg2"}
+    elif kind == "stand-hip":
+        pts["hip"] = (hip[0] + 36 * w, hip[1])
+        pts["knee"] = (knee[0] + 20 * w, knee[1])
+        pts["knee2"] = (knee2[0] + 20 * w, knee2[1])
+        hot = {"leg", "leg2"}
+    elif kind == "thread-needle":
+        head = (180, 480)
+        pts = dict(
+            head=head, neck=(230, 500), shoulder=(280, 520), hip=(460, 540),
+            elbow=(300, 430), hand=(250, 360),
+            elbow2=(320, 560), hand2=mix((360, 600), (220, 620), u),
+            knee=(560, 480), ankle=(640, 500), toe=(690, 490),
+            knee2=(540, 600), ankle2=(640, 640), toe2=(700, 630),
+        )
+        hot = {"arm2"}
+    return pts, hot
+
+
 MOVES = [
     ("ankle-circles", "flight"),
     ("foot-pumps", "flight"),
@@ -266,21 +326,34 @@ MOVES = [
     ("heel-slide", "bed"),
     ("ankle-alphabet", "bed"),
     ("bent-knee-breath", "bed"),
+    ("wall-chest", "hotel"),
+    ("wall-calf", "hotel"),
+    ("stand-hip", "hotel"),
+    ("thread-needle", "hotel"),
 ]
 
 
-def render_one(name: str, place: str, tmp: Path) -> None:
+def pose(place: str, t: float, name: str):
+    if place == "flight":
+        return seat(t, name)
+    if place == "hotel":
+        return room(t, name)
+    return bed(t, name)
+
+
+def render_one(name: str, place: str, avatar: str, tmp: Path) -> None:
     tmp.mkdir(parents=True, exist_ok=True)
     for i in range(FRAMES):
         t = i / FRAMES
         img = Image.new("RGBA", (W, H), PAPER)
         draw = ImageDraw.Draw(img)
         draw_scene(draw, place)
-        pts, hot = (seat if place == "flight" else bed)(t, name)
-        figure(draw, pts, hot)
+        pts, hot = pose(place, t, name)
+        figure(draw, pts, hot, avatar)
         frame = tmp / f"f{i:03d}.png"
         img.convert("RGB").save(frame)
-    dest = OUT / f"{name}.mp4"
+    suffix = "f" if avatar == "f" else "m"
+    dest = OUT / f"{name}-{suffix}.mp4"
     subprocess.run(
         [
             "ffmpeg", "-y", "-framerate", str(FPS),
@@ -300,9 +373,13 @@ def main() -> None:
     root = Path("/tmp/settle-frames")
     if root.exists():
         shutil.rmtree(root)
+    for old in OUT.glob("*.mp4"):
+        if not old.stem.endswith(("-m", "-f")):
+            old.unlink()
     for name, place in MOVES:
-        render_one(name, place, root / name)
-        print(name, (OUT / f"{name}.mp4").stat().st_size)
+        for avatar in ("f", "m"):
+            render_one(name, place, avatar, root / f"{name}-{avatar}")
+            print(f"{name}-{avatar}", (OUT / f"{name}-{avatar[0]}.mp4").stat().st_size)
     shutil.rmtree(root)
 
 

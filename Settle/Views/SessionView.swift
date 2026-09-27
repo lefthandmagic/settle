@@ -4,6 +4,7 @@ import SwiftUI
 struct SessionView: View {
     var exercises: [Exercise]
     var title: String
+    var avatar: Avatar
 
     @State private var index = 0
     @State private var remaining = 0
@@ -14,7 +15,7 @@ struct SessionView: View {
     var body: some View {
         let item = exercises[index]
         VStack(alignment: .leading, spacing: 16) {
-            LoopingVideo(name: item.video)
+            LoopingVideo(name: item.clip(avatar))
                 .frame(maxWidth: .infinity)
                 .frame(height: 320)
                 .clipShape(RoundedRectangle(cornerRadius: 20))
@@ -36,6 +37,9 @@ struct SessionView: View {
                 .font(.body)
                 .foregroundStyle(ink.opacity(0.75))
                 .fixedSize(horizontal: false, vertical: true)
+            Text(item.muscleLine)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(ink.opacity(0.55))
 
             HStack(spacing: 12) {
                 Button("Back") { step(-1) }
