@@ -13,7 +13,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="Seatloose" textAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="title">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" text="MyFlexLife" textAlignment="center" lineBreakMode="tailTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="title">
                                 <rect key="frame" x="32" y="400" width="329" height="41"/>
                                 <fontDescription key="fontDescription" type="boldSystem" pointSize="34"/>
                                 <color key="textColor" red="0.165" green="0.267" blue="0.220" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>

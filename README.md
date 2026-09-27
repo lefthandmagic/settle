@@ -1,4 +1,4 @@
-# Seatloose
+# MyFlexLife
 
 Mobility for a seat or a bed. Twenty movements, each with a short looping demo.
 
